@@ -1,8 +1,10 @@
 mod blitable;
+mod frame;
 mod point;
 mod window;
 
 pub use blitable::Blitable;
+pub use frame::{Frame, FrameType};
 pub use point::Point;
 pub use window::Window;
 

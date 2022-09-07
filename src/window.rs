@@ -1,4 +1,5 @@
-
+/// A render context and/or target. Represents a two dimensional array of characters, with associated functions to manipulate the
+/// contents.
 pub struct Window<const WIDTH: usize, const HEIGHT: usize> {
     data : [[char; WIDTH]; HEIGHT],
     x_clip : Range<i16>,
