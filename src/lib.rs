@@ -1,20 +1,9 @@
-mod blit_target;
-mod blitable;
+mod canvas;
 mod frame;
 mod point;
-mod canvas;
+mod buffer;
 
-pub use blitable::Blitable;
-pub use blit_target::BlitTarget;
+pub use canvas::Canvas;
 pub use frame::{Frame, FrameType};
 pub use point::Point;
-pub use canvas::Canvas;
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-}
+pub use buffer::Buffer;

@@ -21,10 +21,10 @@ impl Frame {
     pub fn new(frame_type: FrameType, width: u16, height: u16) -> Self {
         Frame{frame_type, width, height}
     }
-}
 
-impl Blitable for Frame {
-    fn blit<Pos: Into<Point>, Target: BlitTarget>(&self, target: &mut Target, pos: Pos) {
+
+    /// Draw the frame to the specified [`DrawTarget`]
+    pub fn draw_to_target<Pos: Into<Point>, Target: Canvas>(&self, target: &mut Target, pos: Pos) {
         let charset = match self.frame_type {
             FrameType::Light => ['┌', '┐', '└', '┘', '─', '│'],
             FrameType::Double => ['╔', '╗', '╚', '╝', '═', '║']
@@ -47,4 +47,4 @@ impl Blitable for Frame {
     }
 }
 
-use crate::{Blitable, Point, Canvas, BlitTarget};
+use crate::{Point, Canvas};
