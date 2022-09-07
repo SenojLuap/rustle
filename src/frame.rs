@@ -47,4 +47,4 @@ impl Blitable for Frame {
     }
 }
 
-use crate::{Blitable, Point, Window, BlitTarget};
+use crate::{Blitable, Point, Canvas, BlitTarget};

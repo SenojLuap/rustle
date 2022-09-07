@@ -2,13 +2,13 @@ mod blit_target;
 mod blitable;
 mod frame;
 mod point;
-mod window;
+mod canvas;
 
 pub use blitable::Blitable;
 pub use blit_target::BlitTarget;
 pub use frame::{Frame, FrameType};
 pub use point::Point;
-pub use window::Window;
+pub use canvas::Canvas;
 
 #[cfg(test)]
 mod tests {

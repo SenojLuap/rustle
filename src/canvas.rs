@@ -1,26 +1,25 @@
-/// A render context and/or target. Represents a two dimensional array of characters, with associated functions to manipulate the
-/// contents.
-pub struct Window<const WIDTH: usize, const HEIGHT: usize> {
+/// A 2D target for drawing to, or eventually 'stamping' to another target.
+pub struct Canvas<const WIDTH: usize, const HEIGHT: usize> {
     data : [[char; WIDTH]; HEIGHT],
     x_clip : Range<i16>,
     y_clip : Range<i16>,
 }
 
 
-impl<const WIDTH: usize, const HEIGHT: usize> Window<WIDTH, HEIGHT> {
+impl<const WIDTH: usize, const HEIGHT: usize> Canvas<WIDTH, HEIGHT> {
     
     /// Construct a new [`Window`], initialized to empty space
     pub fn new() -> Result<Self, &'static str> {
         let x_clip = 0..i16::try_from(WIDTH).map_err(|_| "Window may be no wider than i32::MAX")?;
         let y_clip = 0..i16::try_from(HEIGHT).map_err(|_| "Window may be no taller than i32::MAX")?;
-        Ok(Window{data: [[' '; WIDTH]; HEIGHT], x_clip, y_clip})
+        Ok(Canvas{data: [[' '; WIDTH]; HEIGHT], x_clip, y_clip})
     }
 
     /// Construct a new [`Window`], initialized to the provided character
     pub fn new_with_fill(fill: char) -> Result<Self, &'static str> {
         let x_clip = 0..i16::try_from(WIDTH).map_err(|_| "Window may be no wider than i32::MAX")?;
         let y_clip = 0..i16::try_from(HEIGHT).map_err(|_| "Window may be no taller than i32::MAX")?;
-        Ok(Window{data: [[fill; WIDTH]; HEIGHT], x_clip, y_clip})
+        Ok(Canvas{data: [[fill; WIDTH]; HEIGHT], x_clip, y_clip})
     }
     
     /// Render the [`Window`]'s current state
@@ -60,7 +59,7 @@ impl<const WIDTH: usize, const HEIGHT: usize> Window<WIDTH, HEIGHT> {
 }
 
 
-impl<const WIDTH: usize, const HEIGHT: usize> BlitTarget for Window<WIDTH, HEIGHT> {
+impl<const WIDTH: usize, const HEIGHT: usize> BlitTarget for Canvas<WIDTH, HEIGHT> {
     /// Draw a single point with the provided brush
     fn draw<Pos: Into<Point>>(&mut self, brush: char, pos: Pos) {
         let pos = pos.into();
@@ -106,7 +105,7 @@ impl<const WIDTH: usize, const HEIGHT: usize> BlitTarget for Window<WIDTH, HEIGH
             self.draw(brush, (pos.x+y, pos.y-x));
             self.draw(brush, (pos.x-y, pos.y-x));
         };
-        Window::<WIDTH, HEIGHT>::draw_any_circle(radius, draw_func);
+        Canvas::<WIDTH, HEIGHT>::draw_any_circle(radius, draw_func);
     }
 
 
@@ -126,12 +125,12 @@ impl<const WIDTH: usize, const HEIGHT: usize> BlitTarget for Window<WIDTH, HEIGH
                 self.draw(brush, (pos.x-sub_y, pos.y-x));
             }
         };
-        Window::<WIDTH, HEIGHT>::draw_any_circle(radius, draw_func);
+        Canvas::<WIDTH, HEIGHT>::draw_any_circle(radius, draw_func);
     }
 
 }
 
-impl<const SRC_WIDTH: usize, const SRC_HEIGHT: usize> Blitable for Window<SRC_WIDTH, SRC_HEIGHT> {
+impl<const WIDTH: usize, const HEIGHT: usize> Blitable for Canvas<WIDTH, HEIGHT> {
     fn blit<Pos: Into<Point>, Target: BlitTarget>(&self, target: &mut Target, pos: Pos) {
         let pos = pos.into();
         for row in self.data.iter().enumerate() {
