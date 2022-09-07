@@ -18,4 +18,4 @@ pub fn main() {
 
 use cp437_constants::*;
 
-use rustle::{Buffer, Frame, FrameType, Canvas};
+use rustle::{primitives::*, Canvas};
