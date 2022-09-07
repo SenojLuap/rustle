@@ -4,7 +4,7 @@
 /// blit a [`Window`] to another [`Window`]. This is useful to create 'sub windows'.
 pub trait Blitable {
     /// Blit to the specified [`Window`] at an offset from the origin.
-    fn blit<const WIDTH: usize, const HEIGHT: usize, Pos: Into<Point>>(&self, target: &mut Window::<WIDTH, HEIGHT>, pos: Pos);
+    fn blit<Pos: Into<Point>, Target: BlitTarget>(&self, target: &mut Target, pos: Pos);
 }
 
-use crate::{Window, Point};
+use crate::{Point, BlitTarget};

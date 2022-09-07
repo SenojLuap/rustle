@@ -24,7 +24,7 @@ impl Frame {
 }
 
 impl Blitable for Frame {
-    fn blit<const WIDTH: usize, const HEIGHT: usize, Pos: Into<Point>>(&self, target: &mut Window::<WIDTH, HEIGHT>, pos: Pos) {
+    fn blit<Pos: Into<Point>, Target: BlitTarget>(&self, target: &mut Target, pos: Pos) {
         let charset = match self.frame_type {
             FrameType::Light => ['┌', '┐', '└', '┘', '─', '│'],
             FrameType::Double => ['╔', '╗', '╚', '╝', '═', '║']
@@ -47,4 +47,4 @@ impl Blitable for Frame {
     }
 }
 
-use crate::{Blitable, Point, Window};
+use crate::{Blitable, Point, Window, BlitTarget};

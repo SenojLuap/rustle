@@ -38,74 +38,6 @@ impl<const WIDTH: usize, const HEIGHT: usize> Window<WIDTH, HEIGHT> {
         HEIGHT
     }
 
-    /// Draw a single point with the provided brush
-    pub fn draw<Pos: Into<Point>>(&mut self, brush: char, pos: Pos) {
-        let pos = pos.into();
-        if self.x_clip.contains(&pos.x) && self.y_clip.contains(&pos.y) {
-            self.data[usize::try_from(pos.y).unwrap()][usize::try_from(pos.x).unwrap()] = brush;
-        }
-    }
-    
-    /// Draw a hollow square with the provided 'brush'
-    pub fn draw_square<Pos: Into<Point>>(&mut self, brush: char, pos: Pos, width: i16, height: i16) {
-        let pos = pos.into();
-        for x in pos.x..(pos.x+width) {
-            self.draw(brush, (x, pos.y));
-            self.draw(brush, (x, pos.y+height-1));
-        }
-        for y in (pos.y+1)..(pos.y+height-1) {
-            self.draw(brush, (pos.x, y));
-            self.draw(brush, (pos.x+width-1, y));
-        }
-    }
-
-    /// Draw a filled square with the provided 'brush'
-    pub fn draw_filled_square<Pos: Into<Point>>(&mut self, brush: char, pos: Pos, width: i16, height: i16) {
-        let pos = pos.into();
-        for y in pos.y..(pos.y+height) {
-            for x in pos.x..(pos.x+width) {
-                self.draw(brush, (x, y));
-            }
-        }
-    }
-
-    /// Draw a hollow circle with the provided 'brush'
-    pub fn draw_circle<Pos: Into<Point>>(&mut self, brush: char, pos: Pos, radius: u16) {
-        let pos = pos.into();
-
-        let draw_func = move |x: i16, y: i16| {
-            self.draw(brush, (pos.x+x, pos.y+y));
-            self.draw(brush, (pos.x-x, pos.y+y));
-            self.draw(brush, (pos.x+x, pos.y-y));
-            self.draw(brush, (pos.x-x, pos.y-y));
-            self.draw(brush, (pos.x+y, pos.y+x));
-            self.draw(brush, (pos.x-y, pos.y+x));
-            self.draw(brush, (pos.x+y, pos.y-x));
-            self.draw(brush, (pos.x-y, pos.y-x));
-        };
-        Window::<WIDTH, HEIGHT>::draw_any_circle(radius, draw_func);
-    }
-
-
-    /// Draw a filled circle with the provided 'brush'
-    pub fn draw_filled_circle<Pos: Into<Point>>(&mut self, brush: char, pos: Pos, radius: u16) {
-        let pos = pos.into();
-
-        let draw_func = move |x: i16, y: i16| {
-            for sub_y in x..y {
-                self.draw(brush, (pos.x+x, pos.y+sub_y));
-                self.draw(brush, (pos.x-x, pos.y+sub_y));
-                self.draw(brush, (pos.x+x, pos.y-sub_y));
-                self.draw(brush, (pos.x-x, pos.y-sub_y));
-                self.draw(brush, (pos.x+sub_y, pos.y+x));
-                self.draw(brush, (pos.x-sub_y, pos.y+x));
-                self.draw(brush, (pos.x+sub_y, pos.y-x));
-                self.draw(brush, (pos.x-sub_y, pos.y-x));
-            }
-        };
-        Window::<WIDTH, HEIGHT>::draw_any_circle(radius, draw_func);
-    }
-
     /// Generalized algorithm for drawing either a hollow or filled circle
     fn draw_any_circle<DrawFunc>(radius: u16, mut draw_func: DrawFunc) where DrawFunc : FnMut(i16, i16) {
         let radius = i16::try_from(radius).unwrap_or(i16::MAX); // Technically this is undefined/hidden behavior
@@ -127,8 +59,80 @@ impl<const WIDTH: usize, const HEIGHT: usize> Window<WIDTH, HEIGHT> {
     }
 }
 
+
+impl<const WIDTH: usize, const HEIGHT: usize> BlitTarget for Window<WIDTH, HEIGHT> {
+    /// Draw a single point with the provided brush
+    fn draw<Pos: Into<Point>>(&mut self, brush: char, pos: Pos) {
+        let pos = pos.into();
+        if self.x_clip.contains(&pos.x) && self.y_clip.contains(&pos.y) {
+            self.data[usize::try_from(pos.y).unwrap()][usize::try_from(pos.x).unwrap()] = brush;
+        }
+    }
+    
+    /// Draw a hollow square with the provided 'brush'
+    fn draw_square<Pos: Into<Point>>(&mut self, brush: char, pos: Pos, width: i16, height: i16) {
+        let pos = pos.into();
+        for x in pos.x..(pos.x+width) {
+            self.draw(brush, (x, pos.y));
+            self.draw(brush, (x, pos.y+height-1));
+        }
+        for y in (pos.y+1)..(pos.y+height-1) {
+            self.draw(brush, (pos.x, y));
+            self.draw(brush, (pos.x+width-1, y));
+        }
+    }
+
+    /// Draw a filled square with the provided 'brush'
+    fn draw_filled_square<Pos: Into<Point>>(&mut self, brush: char, pos: Pos, width: i16, height: i16) {
+        let pos = pos.into();
+        for y in pos.y..(pos.y+height) {
+            for x in pos.x..(pos.x+width) {
+                self.draw(brush, (x, y));
+            }
+        }
+    }
+
+    /// Draw a hollow circle with the provided 'brush'
+    fn draw_circle<Pos: Into<Point>>(&mut self, brush: char, pos: Pos, radius: u16) {
+        let pos = pos.into();
+
+        let draw_func = move |x: i16, y: i16| {
+            self.draw(brush, (pos.x+x, pos.y+y));
+            self.draw(brush, (pos.x-x, pos.y+y));
+            self.draw(brush, (pos.x+x, pos.y-y));
+            self.draw(brush, (pos.x-x, pos.y-y));
+            self.draw(brush, (pos.x+y, pos.y+x));
+            self.draw(brush, (pos.x-y, pos.y+x));
+            self.draw(brush, (pos.x+y, pos.y-x));
+            self.draw(brush, (pos.x-y, pos.y-x));
+        };
+        Window::<WIDTH, HEIGHT>::draw_any_circle(radius, draw_func);
+    }
+
+
+    /// Draw a filled circle with the provided 'brush'
+    fn draw_filled_circle<Pos: Into<Point>>(&mut self, brush: char, pos: Pos, radius: u16) {
+        let pos = pos.into();
+
+        let draw_func = move |x: i16, y: i16| {
+            for sub_y in x..y {
+                self.draw(brush, (pos.x+x, pos.y+sub_y));
+                self.draw(brush, (pos.x-x, pos.y+sub_y));
+                self.draw(brush, (pos.x+x, pos.y-sub_y));
+                self.draw(brush, (pos.x-x, pos.y-sub_y));
+                self.draw(brush, (pos.x+sub_y, pos.y+x));
+                self.draw(brush, (pos.x-sub_y, pos.y+x));
+                self.draw(brush, (pos.x+sub_y, pos.y-x));
+                self.draw(brush, (pos.x-sub_y, pos.y-x));
+            }
+        };
+        Window::<WIDTH, HEIGHT>::draw_any_circle(radius, draw_func);
+    }
+
+}
+
 impl<const SRC_WIDTH: usize, const SRC_HEIGHT: usize> Blitable for Window<SRC_WIDTH, SRC_HEIGHT> {
-    fn blit<const WIDTH: usize, const HEIGHT: usize, Pos: Into<Point>>(&self, target: &mut Window::<WIDTH, HEIGHT>, pos: Pos) {
+    fn blit<Pos: Into<Point>, Target: BlitTarget>(&self, target: &mut Target, pos: Pos) {
         let pos = pos.into();
         for row in self.data.iter().enumerate() {
             let y = i16::try_from(row.0).unwrap();
@@ -142,4 +146,4 @@ impl<const SRC_WIDTH: usize, const SRC_HEIGHT: usize> Blitable for Window<SRC_WI
 
 use std::ops::Range;
 
-use crate::{Point, Blitable};
+use crate::{Point, Blitable, BlitTarget};

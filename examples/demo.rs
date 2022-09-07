@@ -18,4 +18,4 @@ pub fn main() {
 
 use cp437_constants::*;
 
-use rustle::{Window, Blitable, Frame, FrameType};
+use rustle::{Window, Blitable, Frame, FrameType, BlitTarget};
